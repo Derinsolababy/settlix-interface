@@ -1,96 +1,91 @@
-'use client'
+import Link from 'next/link';
+import { LiveFee } from '@/components/LiveFee';
+import { Receipt } from '@/components/Receipt';
+import { Row, Stamp } from '@/components/ui';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { ArrowRight, QrCode, Zap, Globe, Shield } from 'lucide-react'
+const STEPS = [
+  ['Invoice', 'Enter a USD amount. The oracle prices it in XLM or USDC, and your wallet signs an invoice onto the payment contract with your own reference and an expiry.'],
+  ['Scan', 'The customer scans the QR code. It is a plain link to the invoice page, so any phone camera opens it, with no app to install.'],
+  ['Settle', 'One transaction pays you and the platform fee at once. The contract checks you are an approved merchant and the invoice is open, and never holds the money.'],
+] as const;
+
+const FACTS = [
+  ['Paid once', 'Each invoice can be paid once, and each reference used once, enforced by the contract.'],
+  ['No custody', 'Funds go straight from customer to merchant. Nothing sits in a platform wallet.'],
+  ['Verified merchants', 'Merchants are approved before they can invoice. Only a hash of the business ID is stored on-chain.'],
+  ['Honest prices', 'Quotes are the median of CoinGecko and the Stellar DEX, signed, and expire in two minutes.'],
+] as const;
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-700">
-        <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold">Settlix</div>
-          <div className="flex gap-6">
-            <Link href="/merchant" className="hover:text-blue-400">Merchant</Link>
-            <Link href="/payment" className="hover:text-blue-400">Pay</Link>
-            <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
-              Connect Wallet
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      {/* Hero Section */}
-      <main className="container mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-6">
-            Accept Payments<br />
-            <span className="text-blue-400">Instantly on Stellar</span>
+    <div className="space-y-24">
+      <section className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
+        <div>
+          <p className="eyebrow">Merchant payments on Stellar</p>
+          <h1 className="mt-4 font-display text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl">
+            Paid at the counter.
+            <br />
+            <em className="text-accent">Settled</em> before the receipt prints.
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
-            QR code payments • Instant settlement • Global reach
+          <p className="mt-6 max-w-xl text-lg text-muted">
+            Settlix turns a sale into an on-chain invoice your customer pays by QR code in XLM or USDC. You receive the money in
+            the same transaction, less a <LiveFee /> platform fee.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/merchant/register" className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2">
-              Get Started <ArrowRight size={20} />
-            </Link>
-            <Link href="/payment" className="border border-blue-600 hover:bg-blue-600/10 px-8 py-4 rounded-lg font-semibold text-lg">
-              Make a Payment
-            </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/merchant" className="btn-accent px-6 py-3 text-base">Open the merchant console</Link>
+            <a href="https://github.com/SETTLIX" className="btn-ghost px-6 py-3 text-base">Read the code</a>
           </div>
         </div>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20">
-          <FeatureCard 
-            icon={<QrCode size={32} />}
-            title="QR Payments"
-            description="Generate QR codes for instant customer payments"
-          />
-          <FeatureCard 
-            icon={<Zap size={32} />}
-            title="Instant Settlement"
-            description="Receive funds immediately after payment"
-          />
-          <FeatureCard 
-            icon={<Globe size={32} />}
-            title="Cross-Border"
-            description="Accept payments from anywhere in the world"
-          />
-          <FeatureCard 
-            icon={<Shield size={32} />}
-            title="Secure"
-            description="Built on Stellar blockchain technology"
-          />
+        <div className="mx-auto w-full max-w-sm rotate-[1.5deg]">
+          <Receipt title="Ada Fabrics" subtitle="ORDER-1001 · invoice #1" stamp={<Stamp>Paid</Stamp>}>
+            <Row label="Ankara, 6 yards">$4.27</Row>
+            <div className="my-3 border-t border-dashed border-ink/30" />
+            <Row label="Total">25.00 XLM</Row>
+            <Row label="To merchant">24.875 XLM</Row>
+            <Row label="Platform fee">0.125 XLM</Row>
+            <p className="mt-5 text-center font-mono text-[11px] text-muted">sample receipt</p>
+          </Receipt>
         </div>
+      </section>
 
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20 text-center">
-          <StatCard value="< 5 sec" label="Average Settlement Time" />
-          <StatCard value="0.5%" label="Platform Fee" />
-          <StatCard value="24/7" label="Always Available" />
+      <section>
+        <p className="eyebrow">How it works</p>
+        <ol className="mt-6 divide-y divide-rule border-y border-rule">
+          {STEPS.map(([title, body], i) => (
+            <li key={title} className="grid gap-2 py-6 sm:grid-cols-[5rem_12rem_1fr] sm:gap-6">
+              <span className="font-mono text-sm text-accent">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-display text-2xl">{title}</span>
+              <span className="text-muted">{body}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="grid gap-px overflow-hidden rounded-lg border border-rule bg-rule sm:grid-cols-2">
+        {FACTS.map(([title, body]) => (
+          <div key={title} className="bg-card p-6">
+            <p className="font-display text-xl">{title}</p>
+            <p className="mt-2 text-sm text-muted">{body}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-lg bg-ink p-8 text-card sm:p-10">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-soft">Three repositories, one flow</p>
+        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+          {[
+            ['settlix-contracts', 'Soroban: invoices, merchant registry, fee vault.'],
+            ['settlix-oracle', 'Prices, signed quotes, payment verification.'],
+            ['settlix-interface', 'This app: merchant console and pay page.'],
+          ].map(([repo, body]) => (
+            <a key={repo} href={`https://github.com/SETTLIX/${repo}`} className="group block border-t border-card/20 pt-4">
+              <p className="font-mono text-sm group-hover:text-accent-soft">{repo}</p>
+              <p className="mt-1 text-sm text-card/70">{body}</p>
+            </a>
+          ))}
         </div>
-      </main>
+      </section>
     </div>
-  )
-}
-
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 hover:border-blue-600 transition-colors">
-      <div className="text-blue-400 mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-400">{description}</p>
-    </div>
-  )
-}
-
-function StatCard({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="bg-slate-800 p-8 rounded-lg border border-slate-700">
-      <div className="text-4xl font-bold text-blue-400 mb-2">{value}</div>
-      <div className="text-gray-400">{label}</div>
-    </div>
-  )
+  );
 }
