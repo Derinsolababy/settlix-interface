@@ -70,3 +70,6 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
 ## License
 
 [MIT](LICENSE)
+
+
+<!-- fix: addresses issue #24 -->
